@@ -1,0 +1,48 @@
+name: run python script
+
+on:
+  workflow_dispatch:  # This allows manual triggers
+
+jobs:
+  export-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy matplotlib seaborn jupyter nbconvert
+
+      - name: Run Titanic EDA Notebook
+        run: |
+          jupyter nbconvert --to notebook --execute "Titanic EDA.ipynb" --output executed_notebook.ipynb
+
+      - name: Upload executed notebook
+        uses: actions/upload-artifact@v3
+        with:
+          name: eda-notebook
+          path: executed_notebook.ipynb
+
+      - name: Zip notebook
+        run: zip eda-notebook.zip executed_notebook.ipynb
+
+      - name: Send email with notebook
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Your Executed Notebook"
+          to: ${{ secrets.EMAIL_TO }}
+          from: "Ahmed Sabry <${{ secrets.EMAIL_USERNAME }}>"
+          body: |
+            Titanic EDA notebook from GitHub Actions.
+          attachments: eda-notebook.zip
