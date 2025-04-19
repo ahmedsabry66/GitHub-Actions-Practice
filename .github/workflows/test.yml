@@ -7,32 +7,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: set up python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      
+      - name: cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: install dependencies
         run: |
-          pip install pandas numpy matplotlib seaborn jupyter nbconvert
+          pip install -r requirements.txt
 
-      - name: Run Titanic EDA Notebook
+      - name: run notebook
         run: |
           jupyter nbconvert --to notebook --execute "Titanic EDA.ipynb" --output executed_notebook.ipynb
 
-      - name: Upload executed notebook
+      - name: upload executed notebook
         uses: actions/upload-artifact@v4
         with:
           name: eda-notebook
           path: executed_notebook.ipynb
 
-      - name: Zip notebook
+      - name: zip notebook
         run: zip eda-notebook.zip executed_notebook.ipynb
 
-      - name: Send email with notebook
+      - name: send email with notebook
         uses: dawidd6/action-send-mail@v4
         with:
           server_address: smtp.gmail.com
