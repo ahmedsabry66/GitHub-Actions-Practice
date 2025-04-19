@@ -27,6 +27,15 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: convert notebook for linting
+        run: jupyter nbconvert --to script "Titanic EDA.ipynb"
+
+      - name: lint code with flake8
+        run: flake8 .
+
+      - name: remove .py file
+        run: rm "Titanic EDA.py"
+
       - name: run notebook
         run: |
           jupyter nbconvert --to notebook --execute "Titanic EDA.ipynb" --output executed_notebook.ipynb
