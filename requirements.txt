@@ -1,7 +1,7 @@
 pandas
-numpy
 matplotlib
 seaborn
 jupyter
 nbconvert
 flake8
+autopep8

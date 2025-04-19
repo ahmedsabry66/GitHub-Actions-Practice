@@ -30,6 +30,9 @@ jobs:
       - name: convert notebook for linting
         run: jupyter nbconvert --to script "Titanic EDA.ipynb"
 
+      - name: fix lint issues
+        run: autopep8 --in-place --aggressive --aggressive "Titanic EDA.py"
+
       - name: lint code with flake8
         run: flake8 .
 
